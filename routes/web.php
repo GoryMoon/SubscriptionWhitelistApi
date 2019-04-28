@@ -11,24 +11,14 @@
 |
 */
 
+$router->group(['prefix' => '{id}'], function() use ($router) {
+	$router->get('csv', 'GeneralController@csv');
+	$router->get('nl', 'GeneralController@nl');
+	$router->get('json_array', 'GeneralController@json_array');
 
-$router->group(['prefix' => 'list'], function () use ($router) {
-    $router->get('', function () {
-        return [
-            'version' => '0.1.0'
-        ];
-    });
-
-
-    $router->group(['prefix' => '{id}'], function() use ($router) {
-        $router->get('csv', 'GeneralController@csv');
-        $router->get('nl', 'GeneralController@nl');
-        $router->get('json_array', 'GeneralController@json_array');
-
-        $router->get('[{path:.*}]', function () {
-            return response(['message' => 'Invalid endpoint'], 404);
-        });
-    });
+	$router->get('[{path:.*}]', function () {
+                 return response(['message' => 'Invalid endpoint'], 404);
+	});
 });
 
 $router->get('[{path:.*}]', function () {
