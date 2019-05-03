@@ -5,7 +5,10 @@ namespace App\Repo;
 
 
 use App\Models\Channel;
+use App\Models\RequestStat;
 use App\Models\Whitelist;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 class WhitelistRepository
@@ -18,7 +21,7 @@ class WhitelistRepository
 
     /**
      * @param string $id
-     * @return Channel|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Model|object|null
+     * @return Channel|Builder|Model|object|null
      */
     public function getChannel($id) {
         return $this->channel = Channel::whereId($id)->first();
@@ -33,10 +36,16 @@ class WhitelistRepository
         $dirty = $this->channel->whitelist_dirty;
         $key = $type . '-' . $id;
 
+        $stat = new RequestStat;
+        $stat->channel()->associate($this->channel);
+        $stat->save();
+        $this->channel->requests++;
+
         if (app('cache')->has($key)) {
             if ($dirty) {
                 app('cache')->forget($key);
             } else {
+                $this->channel->save();
                 return app('cache')->get($key);
             }
         }

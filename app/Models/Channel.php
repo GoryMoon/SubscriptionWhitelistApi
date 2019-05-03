@@ -31,6 +31,9 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Channel whereUpdatedAt($value)
  * @method static Builder|Channel whereValidPlans($value)
  * @method static Builder|Channel whereWhitelistDirty($value)
+ * @property int $requests
+ * @property-read Collection|RequestStat[] $stats
+ * @method static Builder|Channel whereRequests($value)
  */
 class Channel extends Model
 {
@@ -41,6 +44,10 @@ class Channel extends Model
 
     public function whitelist() {
         return $this->hasMany('App\Models\Whitelist');
+    }
+
+    public function stats() {
+        return $this->hasMany('App\Models\RequestStat');
     }
 
 }

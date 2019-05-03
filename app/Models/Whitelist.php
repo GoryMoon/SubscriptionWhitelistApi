@@ -28,6 +28,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Whitelist whereUserId($value)
  * @method static Builder|Whitelist whereUsername($value)
  * @method static Builder|Whitelist whereValid($value)
+ * @property-read bool $is_subscriber
+ * @property-read bool $is_valid
  */
 class Whitelist extends Model
 {
