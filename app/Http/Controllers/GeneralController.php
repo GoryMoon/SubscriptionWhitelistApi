@@ -23,7 +23,7 @@ class GeneralController extends Controller
             $channel = $this->repository->getChannel($ids[0]);
             if (!is_null($channel)) {
                 $list = $this->repository->getWhitelist($type, $id);
-                return response($list, 200, ['Content-type: ' . $content]);
+                return response($list, 200, ['Content-Type' =>  $content . "; charset=UTF-8"]);
             }
         }
         return response()->json([
