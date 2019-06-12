@@ -41,21 +41,21 @@ class WhitelistRepository
         $stat->save();
         $this->channel->requests++;
 
-        if (app('cache')->has($key)) {
+        if (app('cache')->tags($id)->has($key)) {
             if ($dirty) {
-                app('cache')->forget($key);
+                app('cache')->tags($id)->flush();
             } else {
                 $this->channel->save();
-                return app('cache')->get($key);
+                return app('cache')->tags($id)->get($key);
             }
         }
         $this->channel->whitelist_dirty = false;
         $this->channel->save();
 
-        $whitelist = $this->channel->whitelist;
+        $whitelist = $this->channel->whitelist()->with('minecraft')->get();
         $list = $this->$type($whitelist);
 
-        app('cache')->put($key, $list, 1800);
+        app('cache')->tags($id)->put($key, $list, 1800);
         return $list;
     }
 
@@ -64,7 +64,31 @@ class WhitelistRepository
      * @return mixed
      */
     private function process($list) {
-        return $list->filter([$this, 'filterValid'])->map([$this, 'mapUsername'])->flatten()->toArray();
+        return $list->filter([$this, 'filterValid'])->map([$this, 'mapUsername'])->toArray();
+    }
+
+    /**
+     * @param Collection $list
+     * @return Collection
+     */
+    private function minecraftProcess($list) {
+        return $list->filter([$this, 'filterValid'])->filter([$this, 'filterMinecraft']);
+    }
+
+    /**
+     * @param Collection $list
+     * @return mixed
+     */
+    private function minecraftUuidProcess($list) {
+        return $this->minecraftProcess($list)->map([$this, 'mapMinecraftUuid'])->flatten()->toArray();
+    }
+
+    /**
+     * @param Collection $list
+     * @return mixed
+     */
+    private function minecraftWhitelistProcess($list) {
+        return $this->minecraftProcess($list)->map([$this, 'mapMinecraftWhitelist'])->values()->toArray();
     }
 
     /**
@@ -77,10 +101,34 @@ class WhitelistRepository
 
     /**
      * @param Whitelist $value
-     * @return string mixed
+     * @return bool
+     */
+    public function filterMinecraft($value) {
+        return !is_null($value->minecraft);
+    }
+
+    /**
+     * @param Whitelist $value
+     * @return string
      */
     public function mapUsername($value) {
         return $value->username;
+    }
+
+    /**
+     * @param Whitelist $value
+     * @return string
+     */
+    public function mapMinecraftUuid($value) {
+        return $value->minecraft->uuid;
+    }
+
+    /**
+     * @param Whitelist $value
+     * @return array
+     */
+    public function mapMinecraftWhitelist($value) {
+        return ['uuid' => $value->minecraft->uuid, 'name' => $value->minecraft->username];
     }
 
     /**
@@ -105,6 +153,38 @@ class WhitelistRepository
      */
     public function json_array(Collection $list) {
         return json_encode($this->process($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function minecraft_csv(Collection $list) {
+        return join(',', $this->minecraftUuidProcess($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function minecraft_nl(Collection $list) {
+        return join("\n", $this->minecraftUuidProcess($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function minecraft_json_array(Collection $list) {
+        return json_encode($this->minecraftUuidProcess($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function minecraft_whitelist(Collection $list) {
+        return json_encode($this->minecraftWhitelistProcess($list));
     }
 
 }

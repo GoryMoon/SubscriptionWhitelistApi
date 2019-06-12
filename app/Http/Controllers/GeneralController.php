@@ -43,5 +43,20 @@ class GeneralController extends Controller
         return $this->handleRequest($id, 'json_array', 'application/json');
     }
 
+    public function minecraft_csv($id) {
+        return $this->handleRequest($id, 'minecraft_csv', 'text/csv');
+    }
+
+    public function minecraft_nl($id) {
+        return $this->handleRequest($id, 'minecraft_nl', 'text/plain');
+    }
+
+    public function minecraft_json_array($id) {
+        return $this->handleRequest($id, 'minecraft_json_array', 'application/json');
+    }
+
+    public function minecraft_whitelist($id) {
+        return $this->handleRequest($id, 'minecraft_whitelist', 'application/json');
+    }
 
 }

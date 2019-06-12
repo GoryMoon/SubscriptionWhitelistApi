@@ -30,12 +30,16 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Whitelist whereValid($value)
  * @property-read bool $is_subscriber
  * @property-read bool $is_valid
+ * @property int|null $minecraft_id
+ * @property-read array $status
+ * @property-read \App\Models\MinecraftUser|null $minecraft
+ * @method static Builder|Whitelist whereMinecraftId($value)
  */
 class Whitelist extends Model
 {
 
-    protected $hidden = ['user_id', 'channel_id', 'created_at', 'updated_at', 'valid'];
-    protected $appends = ['is_subscriber', 'is_valid'];
+    protected $hidden = ['user_id', 'channel_id', 'created_at', 'updated_at', 'valid', 'minecraft'];
+    protected $appends = ['is_subscriber', 'status'];
 
     public function user() {
         return $this->belongsTo('App\Models\TwitchUser', 'user_id');
@@ -43,6 +47,10 @@ class Whitelist extends Model
 
     public function channel() {
         return $this->belongsTo('App\Models\Channel');
+    }
+
+    public function minecraft() {
+        return $this->belongsTo('App\Models\MinecraftUser');
     }
 
     /**
@@ -53,10 +61,15 @@ class Whitelist extends Model
     }
 
     /**
-     * @return bool
+     * @return array
      */
-    public function getIsValidAttribute() {
-        return $this->valid == true;
+    public function getStatusAttribute() {
+        $minecraft = $this->minecraft;
+        $name = "";
+        if (!is_null($minecraft)) {
+            $name = $minecraft->username;
+        }
+        return ['valid'  => $this->valid == true, 'minecraft' => $name];
     }
 
 }
