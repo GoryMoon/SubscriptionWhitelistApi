@@ -18,6 +18,9 @@ $router->group(['prefix' => '{id}'], function() use ($router) {
     $router->get('minecraft_csv', 'GeneralController@minecraft_csv');
     $router->get('minecraft_nl', 'GeneralController@minecraft_nl');
     $router->get('minecraft_json_array', 'GeneralController@minecraft_json_array');
+    $router->get('minecraft_uuid_csv', 'GeneralController@minecraft_uuid_csv');
+    $router->get('minecraft_uuid_nl', 'GeneralController@minecraft_uuid_nl');
+    $router->get('minecraft_uuid_json_array', 'GeneralController@minecraft_uuid_json_array');
     $router->get('minecraft_whitelist', 'GeneralController@minecraft_whitelist');
 
     $router->get('[{path:.*}]', function () {

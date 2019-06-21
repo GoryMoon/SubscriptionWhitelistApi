@@ -87,6 +87,14 @@ class WhitelistRepository
      * @param Collection $list
      * @return mixed
      */
+    private function minecraftNameProcess($list) {
+        return $this->minecraftProcess($list)->map([$this, 'mapMinecraftName'])->flatten()->toArray();
+    }
+
+    /**
+     * @param Collection $list
+     * @return mixed
+     */
     private function minecraftWhitelistProcess($list) {
         return $this->minecraftProcess($list)->map([$this, 'mapMinecraftWhitelist'])->values()->toArray();
     }
@@ -125,6 +133,14 @@ class WhitelistRepository
 
     /**
      * @param Whitelist $value
+     * @return string
+     */
+    public function mapMinecraftName($value) {
+        return $value->minecraft->username;
+    }
+
+    /**
+     * @param Whitelist $value
      * @return array
      */
     public function mapMinecraftWhitelist($value) {
@@ -159,7 +175,7 @@ class WhitelistRepository
      * @param Collection $list
      * @return string
      */
-    public function minecraft_csv(Collection $list) {
+    public function minecraft_uuid_csv(Collection $list) {
         return join(',', $this->minecraftUuidProcess($list));
     }
 
@@ -167,7 +183,7 @@ class WhitelistRepository
      * @param Collection $list
      * @return string
      */
-    public function minecraft_nl(Collection $list) {
+    public function minecraft_uuid_nl(Collection $list) {
         return join("\n", $this->minecraftUuidProcess($list));
     }
 
@@ -175,8 +191,32 @@ class WhitelistRepository
      * @param Collection $list
      * @return string
      */
-    public function minecraft_json_array(Collection $list) {
+    public function minecraft_uuid_json_array(Collection $list) {
         return json_encode($this->minecraftUuidProcess($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function minecraft_csv(Collection $list) {
+        return join(',', $this->minecraftNameProcess($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function minecraft_nl(Collection $list) {
+        return join("\n", $this->minecraftNameProcess($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function minecraft_json_array(Collection $list) {
+        return json_encode($this->minecraftNameProcess($list));
     }
 
     /**
