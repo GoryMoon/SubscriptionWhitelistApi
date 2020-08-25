@@ -71,4 +71,16 @@ class GeneralController extends Controller
         return $this->handleRequest($id, 'minecraft_whitelist', 'application/json');
     }
 
+    public function steam_csv($id) {
+        return $this->handleRequest($id, 'steam_csv', 'text/csv');
+    }
+
+    public function steam_nl($id) {
+        return $this->handleRequest($id, 'steam_nl', 'text/plain');
+    }
+
+    public function steam_json_array($id) {
+        return $this->handleRequest($id, 'steam_json_array', 'application/json');
+    }
+
 }

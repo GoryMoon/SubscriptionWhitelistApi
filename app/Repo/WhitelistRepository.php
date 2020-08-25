@@ -59,6 +59,14 @@ class WhitelistRepository
         return $list;
     }
 
+
+
+    /**
+     *
+     * Process to filter and map values
+     *
+     */
+
     /**
      * @param Collection $list
      * @return mixed
@@ -100,6 +108,22 @@ class WhitelistRepository
     }
 
     /**
+     * @param Collection $list
+     * @return mixed
+     */
+    private function steamProcess($list) {
+        return $list->filter([$this, 'filterValid'])->filter([$this, 'filterSteam'])->map([$this, 'mapSteam'])->flatten()->toArray();
+    }
+
+
+
+    /**
+     *
+     * Value filtering
+     *
+     */
+
+    /**
      * @param Whitelist $value
      * @return bool
      */
@@ -114,6 +138,22 @@ class WhitelistRepository
     public function filterMinecraft($value) {
         return !is_null($value->minecraft);
     }
+
+    /**
+     * @param Whitelist $value
+     * @return bool
+     */
+    public function filterSteam($value) {
+        return !is_null($value->steam);
+    }
+
+
+
+    /**
+     *
+     * Value mapping
+     *
+     */
 
     /**
      * @param Whitelist $value
@@ -146,6 +186,22 @@ class WhitelistRepository
     public function mapMinecraftWhitelist($value) {
         return ['uuid' => $value->minecraft->uuid, 'name' => $value->minecraft->username];
     }
+
+    /**
+     * @param Whitelist $value
+     * @return string
+     */
+    public function mapSteam($value) {
+        return $value->steam->steam_id;
+    }
+
+
+
+    /**
+     *
+     * List assembly
+     *
+     */
 
     /**
      * @param Collection $list
@@ -225,6 +281,30 @@ class WhitelistRepository
      */
     public function minecraft_whitelist(Collection $list) {
         return json_encode($this->minecraftWhitelistProcess($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function steam_csv(Collection $list) {
+        return join(',', $this->steamProcess($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function steam_nl(Collection $list) {
+        return join("\n", $this->steamProcess($list));
+    }
+
+    /**
+     * @param Collection $list
+     * @return string
+     */
+    public function steam_json_array(Collection $list) {
+        return json_encode($this->steamProcess($list));
     }
 
 }

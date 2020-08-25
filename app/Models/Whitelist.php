@@ -16,8 +16,15 @@ use Illuminate\Support\Carbon;
  * @property int $channel_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property int|null $minecraft_id
+ * @property int|null $steam_id
  * @property-read Channel $channel
  * @property-read TwitchUser|null $user
+ * @property-read bool $is_subscriber
+ * @property-read bool $is_valid
+ * @property-read array $status
+ * @property-read MinecraftUser|null $minecraft
+ * @property-read SteamUser $steam
  * @method static Builder|Whitelist newModelQuery()
  * @method static Builder|Whitelist newQuery()
  * @method static Builder|Whitelist query()
@@ -28,12 +35,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|Whitelist whereUserId($value)
  * @method static Builder|Whitelist whereUsername($value)
  * @method static Builder|Whitelist whereValid($value)
- * @property-read bool $is_subscriber
- * @property-read bool $is_valid
- * @property int|null $minecraft_id
- * @property-read array $status
- * @property-read \App\Models\MinecraftUser|null $minecraft
  * @method static Builder|Whitelist whereMinecraftId($value)
+ * @method static Builder|Whitelist whereSteamId($value)
  */
 class Whitelist extends Model
 {
@@ -42,15 +45,19 @@ class Whitelist extends Model
     protected $appends = ['is_subscriber', 'status'];
 
     public function user() {
-        return $this->belongsTo('App\Models\TwitchUser', 'user_id');
+        return $this->belongsTo(TwitchUser::class, 'user_id');
     }
 
     public function channel() {
-        return $this->belongsTo('App\Models\Channel');
+        return $this->belongsTo(Channel::class);
     }
 
     public function minecraft() {
-        return $this->belongsTo('App\Models\MinecraftUser');
+        return $this->belongsTo(MinecraftUser::class, 'minecraft_id');
+    }
+
+    public function steam() {
+        return $this->belongsTo(SteamUser::class, 'steam_id');
     }
 
     /**
@@ -69,7 +76,14 @@ class Whitelist extends Model
         if (!is_null($minecraft)) {
             $name = $minecraft->username;
         }
-        return ['valid'  => $this->valid == true, 'minecraft' => $name];
+        return ['valid'  => $this->valid == true, 'minecraft' => $name, 'steam' => $this->steam()->exists()];
     }
 
+    protected static function boot(){
+        parent::boot();
+
+        self::deleting(function (Whitelist $whitelist) {
+            $whitelist->minecraft()->delete();
+        });
+    }
 }
