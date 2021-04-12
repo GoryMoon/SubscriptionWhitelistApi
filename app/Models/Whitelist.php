@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
@@ -19,71 +20,71 @@ use Illuminate\Support\Carbon;
  * @property int|null $minecraft_id
  * @property int|null $steam_id
  * @property-read Channel $channel
- * @property-read TwitchUser|null $user
+ * @property-read mixed $hash_id
  * @property-read bool $is_subscriber
- * @property-read bool $is_valid
  * @property-read array $status
  * @property-read MinecraftUser|null $minecraft
- * @property-read SteamUser $steam
+ * @property-read SteamUser|null $steam
+ * @property-read TwitchUser|null $user
  * @method static Builder|Whitelist newModelQuery()
  * @method static Builder|Whitelist newQuery()
  * @method static Builder|Whitelist query()
  * @method static Builder|Whitelist whereChannelId($value)
  * @method static Builder|Whitelist whereCreatedAt($value)
  * @method static Builder|Whitelist whereId($value)
+ * @method static Builder|Whitelist whereMinecraftId($value)
+ * @method static Builder|Whitelist whereSteamId($value)
  * @method static Builder|Whitelist whereUpdatedAt($value)
  * @method static Builder|Whitelist whereUserId($value)
  * @method static Builder|Whitelist whereUsername($value)
  * @method static Builder|Whitelist whereValid($value)
- * @method static Builder|Whitelist whereMinecraftId($value)
- * @method static Builder|Whitelist whereSteamId($value)
  */
 class Whitelist extends Model
 {
 
-    protected $hidden = ['user_id', 'channel_id', 'created_at', 'updated_at', 'valid', 'minecraft'];
-    protected $appends = ['is_subscriber', 'status'];
+    protected $hidden = ['id', 'user_id', 'channel_id', 'created_at', 'updated_at', 'valid', 'minecraft', 'minecraft_id', 'steam', 'steam_id'];
+    protected $appends = ['hash_id', 'is_subscriber', 'status'];
 
-    public function user() {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(TwitchUser::class, 'user_id');
     }
 
-    public function channel() {
+    public function channel(): BelongsTo
+    {
         return $this->belongsTo(Channel::class);
     }
 
-    public function minecraft() {
+    public function minecraft(): BelongsTo
+    {
         return $this->belongsTo(MinecraftUser::class, 'minecraft_id');
     }
 
-    public function steam() {
+    public function steam(): BelongsTo
+    {
         return $this->belongsTo(SteamUser::class, 'steam_id');
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsSubscriberAttribute() {
+    public function getIsSubscriberAttribute(): bool
+    {
         return $this->user_id != null;
+    }
+
+    public function getHashIdAttribute(): string
+    {
+        return app('hashids')->connection('whitelist')->encode($this->id);
     }
 
     /**
      * @return array
      */
-    public function getStatusAttribute() {
+    public function getStatusAttribute(): array
+    {
         $minecraft = $this->minecraft;
         $name = "";
         if (!is_null($minecraft)) {
             $name = $minecraft->username;
         }
-        return ['valid'  => $this->valid == true, 'minecraft' => $name, 'steam' => $this->steam()->exists()];
-    }
-
-    protected static function boot(){
-        parent::boot();
-
-        self::deleting(function (Whitelist $whitelist) {
-            $whitelist->minecraft()->delete();
-        });
+        return ['valid'  => $this->valid == true, 'minecraft' => $name, 'steam' => isset($this->steam)];
     }
 }

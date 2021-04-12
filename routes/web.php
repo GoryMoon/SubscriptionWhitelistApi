@@ -1,5 +1,7 @@
 <?php
 
+/** @var \Laravel\Lumen\Routing\Router $router */
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -29,7 +31,7 @@ $router->group(['prefix' => '{id}'], function() use ($router) {
     $router->get('steam_json_array', 'GeneralController@steam_json_array');
 
     $router->get('[{path:.*}]', function () {
-                 return response(['message' => 'Invalid endpoint'], 404);
+        return response(['message' => 'Invalid endpoint'], 404);
 	});
 });
 

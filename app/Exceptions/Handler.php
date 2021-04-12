@@ -2,9 +2,13 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Validation\ValidationException;
+use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
@@ -30,6 +34,8 @@ class Handler extends ExceptionHandler
      *
      * @param Throwable $exception
      * @return void
+     *
+     * @throws Exception
      */
     public function report(Throwable $exception)
     {
@@ -39,9 +45,11 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Throwable  $exception
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @param  Request  $request
+     * @param Throwable $exception
+     * @return Response|JsonResponse
+     *
+     * @throws Throwable
      */
     public function render($request, Throwable $exception)
     {
