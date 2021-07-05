@@ -63,6 +63,10 @@ class GeneralController extends Controller
         return $this->handleRequest($id, 'minecraft_nl', 'text/plain');
     }
 
+    public function minecraft_twitch_nl(string $id) {
+        return $this->handleRequest($id, 'minecraft_twitch_nl', 'text/plain');
+    }
+
     public function minecraft_json_array(string $id) {
         return $this->handleRequest($id, 'minecraft_json_array', 'application/json');
     }

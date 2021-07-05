@@ -101,6 +101,16 @@ class WhitelistRepository
     }
 
     /**
+     * Process to filter and get all valid minecraft:twitch usernames
+     * @param Collection $list
+     * @return array
+     */
+    private function minecraftTwitchNameProcess(Collection $list): array
+    {
+        return $this->minecraftProcess($list)->map([$this, 'mapMinecraftTwitchName'])->flatten()->toArray();
+    }
+
+    /**
      * Process to filter and get all valid minecraft uuids and names in the vanilla whitelist format
      * @param Collection $list
      * @return array
@@ -194,6 +204,20 @@ class WhitelistRepository
     public function mapMinecraftName(Whitelist $value): string
     {
         return $value->minecraft->username;
+    }
+
+    /**
+     * Maps a whitelist entry to the minecraft:twitch username
+     * @param Whitelist $value
+     * @return string
+     */
+    public function mapMinecraftTwitchName(Whitelist $value): string
+	{
+		if (is_null($value->user) || strcasecmp($value->minecraft->username, $value->user->name) === 0) {
+		    return $value->minecraft->username;
+		} else {
+			return $value->minecraft->username . ':' . $value->user->name;
+		}
     }
 
     /**
@@ -302,6 +326,16 @@ class WhitelistRepository
     public function minecraft_nl(Collection $list): string
     {
         return join("\n", $this->minecraftNameProcess($list));
+    }
+
+    /**
+     * Formats the minecraft:twitch usernames to a newline string
+     * @param Collection $list
+     * @return string
+     */
+    public function minecraft_twitch_nl(Collection $list): string
+    {
+        return join("\n", $this->minecraftTwitchNameProcess($list));
     }
 
     /**
