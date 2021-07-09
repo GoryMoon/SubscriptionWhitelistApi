@@ -213,10 +213,10 @@ class WhitelistRepository
      */
     public function mapMinecraftTwitchName(Whitelist $value): string
 	{
-		if (is_null($value->user) || strcasecmp($value->minecraft->username, $value->user->name) === 0) {
+		if (is_null($value->user) || strcasecmp($value->minecraft->username, $value->user->display_name) === 0) {
 		    return $value->minecraft->username;
 		} else {
-			return $value->minecraft->username . ':' . $value->user->name;
+			return $value->minecraft->username . ':' . $value->user->display_name;
 		}
     }
 
