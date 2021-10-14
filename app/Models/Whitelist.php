@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\Whitelist
+ * App\Models\Whitelist.
  *
  * @property int $id
  * @property string $username
@@ -19,13 +19,14 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $updated_at
  * @property int|null $minecraft_id
  * @property int|null $steam_id
- * @property-read Channel $channel
- * @property-read mixed $hash_id
- * @property-read bool $is_subscriber
- * @property-read array $status
- * @property-read MinecraftUser|null $minecraft
- * @property-read SteamUser|null $steam
- * @property-read TwitchUser|null $user
+ * @property Channel $channel
+ * @property mixed $hash_id
+ * @property bool $is_subscriber
+ * @property array $status
+ * @property MinecraftUser|null $minecraft
+ * @property SteamUser|null $steam
+ * @property TwitchUser|null $user
+ *
  * @method static Builder|Whitelist newModelQuery()
  * @method static Builder|Whitelist newQuery()
  * @method static Builder|Whitelist query()
@@ -41,7 +42,6 @@ use Illuminate\Support\Carbon;
  */
 class Whitelist extends Model
 {
-
     protected $hidden = ['id', 'user_id', 'channel_id', 'created_at', 'updated_at', 'valid', 'minecraft', 'minecraft_id', 'steam', 'steam_id'];
     protected $appends = ['hash_id', 'is_subscriber', 'status'];
 
@@ -67,7 +67,7 @@ class Whitelist extends Model
 
     public function getIsSubscriberAttribute(): bool
     {
-        return $this->user_id != null;
+        return null != $this->user_id;
     }
 
     public function getHashIdAttribute(): string
@@ -81,10 +81,11 @@ class Whitelist extends Model
     public function getStatusAttribute(): array
     {
         $minecraft = $this->minecraft;
-        $name = "";
-        if (!is_null($minecraft)) {
+        $name = '';
+        if ( ! is_null($minecraft)) {
             $name = $minecraft->username;
         }
-        return ['valid'  => $this->valid == true, 'minecraft' => $name, 'steam' => isset($this->steam)];
+
+        return ['valid' => true == $this->valid, 'minecraft' => $name, 'steam' => isset($this->steam)];
     }
 }

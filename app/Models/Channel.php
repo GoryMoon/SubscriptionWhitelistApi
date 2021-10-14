@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\Channel
+ * App\Models\Channel.
  *
  * @property int $id
  * @property int $enabled
@@ -19,11 +19,12 @@ use Illuminate\Support\Carbon;
  * @property int $requests
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read TwitchUser|null $owner
- * @property-read Collection|RequestStat[] $stats
- * @property-read int|null $stats_count
- * @property-read Collection|Whitelist[] $whitelist
- * @property-read int|null $whitelist_count
+ * @property TwitchUser|null $owner
+ * @property Collection|RequestStat[] $stats
+ * @property int|null $stats_count
+ * @property Collection|Whitelist[] $whitelist
+ * @property int|null $whitelist_count
+ *
  * @method static Builder|Channel newModelQuery()
  * @method static Builder|Channel newQuery()
  * @method static Builder|Channel query()
@@ -39,16 +40,18 @@ use Illuminate\Support\Carbon;
  */
 class Channel extends Model
 {
-    public function owner() {
+    public function owner()
+    {
         return $this->hasOne(TwitchUser::class);
     }
 
-    public function whitelist() {
+    public function whitelist()
+    {
         return $this->hasMany(Whitelist::class);
     }
 
-    public function stats() {
+    public function stats()
+    {
         return $this->hasMany(RequestStat::class);
     }
-
 }

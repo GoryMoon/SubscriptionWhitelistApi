@@ -12,10 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
-use Vinkla\Hashids\Facades\Hashids;
 
 /**
- * App\Models\TwitchUser
+ * App\Models\TwitchUser.
  *
  * @property int $id
  * @property string $uid
@@ -27,12 +26,13 @@ use Vinkla\Hashids\Facades\Hashids;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property string|null $refresh_token
- * @property-read Channel|null $channel
- * @property-read bool $admin
- * @property-read bool $broadcaster
- * @property-read SteamUser|null $steam
- * @property-read Collection|Whitelist[] $whitelist
- * @property-read int|null $whitelist_count
+ * @property Channel|null $channel
+ * @property bool $admin
+ * @property bool $broadcaster
+ * @property SteamUser|null $steam
+ * @property Collection|Whitelist[] $whitelist
+ * @property int|null $whitelist_count
+ *
  * @method static Builder|TwitchUser newModelQuery()
  * @method static Builder|TwitchUser newQuery()
  * @method static Builder|TwitchUser query()
@@ -57,11 +57,12 @@ class TwitchUser extends Model implements AuthenticatableContract
         'display_name',
         'broadcaster_type',
         'access_token',
-        'refresh_token'
+        'refresh_token',
     ];
 
     /**
-     * Returns the channel the user has
+     * Returns the channel the user has.
+     *
      * @return BelongsTo
      */
     public function channel(): BelongsTo
@@ -70,7 +71,8 @@ class TwitchUser extends Model implements AuthenticatableContract
     }
 
     /**
-     * Returns the whitelist the user have
+     * Returns the whitelist the user have.
+     *
      * @return HasMany
      */
     public function whitelist(): HasMany
@@ -79,7 +81,8 @@ class TwitchUser extends Model implements AuthenticatableContract
     }
 
     /**
-     * Returns the connected steam account if any
+     * Returns the connected steam account if any.
+     *
      * @return HasOne
      */
     public function steam(): HasOne
@@ -88,10 +91,12 @@ class TwitchUser extends Model implements AuthenticatableContract
     }
 
     /**
-     * Encrypts the token and sets it
+     * Encrypts the token and sets it.
+     *
      * @param string|null $value string
      */
-    public function setRefreshTokenAttribute(?string $value) {
+    public function setRefreshTokenAttribute(?string $value)
+    {
         if (is_null($value)) {
             $this->attributes['refresh_token'] = null;
         } else {
@@ -100,28 +105,34 @@ class TwitchUser extends Model implements AuthenticatableContract
     }
 
     /**
-     * Decrypts the refresh token and returns it
+     * Decrypts the refresh token and returns it.
+     *
      * @param string|null $value string
+     *
      * @return string|null
      */
     public function getRefreshTokenAttribute(?string $value): ?string
     {
-        if (!is_null($value)) {
+        if ( ! is_null($value)) {
             try {
                 return decrypt($value);
             } catch (DecryptException $e) {
                 report($e);
+
                 return null;
             }
         }
+
         return null;
     }
 
     /**
-     * Encrypts the token and sets it
+     * Encrypts the token and sets it.
+     *
      * @param string|null $value string
      */
-    public function setAccessTokenAttribute(?string $value) {
+    public function setAccessTokenAttribute(?string $value)
+    {
         if (is_null($value)) {
             $this->attributes['access_token'] = null;
         } else {
@@ -130,20 +141,24 @@ class TwitchUser extends Model implements AuthenticatableContract
     }
 
     /**
-     * Decrypts the access token and returns it
+     * Decrypts the access token and returns it.
+     *
      * @param string|null $value string
+     *
      * @return string
      */
     public function getAccessTokenAttribute(?string $value): ?string
     {
-        if (!is_null($value)) {
+        if ( ! is_null($value)) {
             try {
                 return decrypt($value);
             } catch (DecryptException $e) {
                 report($e);
+
                 return null;
             }
         }
+
         return null;
     }
 
@@ -154,6 +169,6 @@ class TwitchUser extends Model implements AuthenticatableContract
 
     public function getBroadcasterAttribute(): bool
     {
-        return $this->broadcaster_type != '' || $this->admin;
+        return '' != $this->broadcaster_type || $this->admin;
     }
 }

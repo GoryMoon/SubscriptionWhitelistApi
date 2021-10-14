@@ -8,14 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
- * App\Models\MinecraftUser
+ * App\Models\MinecraftUser.
  *
  * @property int $id
  * @property string $uuid
  * @property string $username
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read Whitelist|null $whitelist
+ * @property Whitelist|null $whitelist
+ *
  * @method static Builder|MinecraftUser newModelQuery()
  * @method static Builder|MinecraftUser newQuery()
  * @method static Builder|MinecraftUser query()
@@ -24,16 +25,13 @@ use Illuminate\Support\Carbon;
  * @method static Builder|MinecraftUser whereUpdatedAt($value)
  * @method static Builder|MinecraftUser whereUsername($value)
  * @method static Builder|MinecraftUser whereUuid($value)
-
  */
 class MinecraftUser extends Model
 {
-
     protected $fillable = ['uuid', 'username'];
 
     public function whitelist(): HasOne
     {
         return $this->hasOne(Whitelist::class);
     }
-
 }

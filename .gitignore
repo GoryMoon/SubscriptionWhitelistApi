@@ -6,3 +6,5 @@ Homestead.yaml
 
 _ide_helper.php
 .phpstorm.meta.php
+.php-cs-fixer.cache
+.php_cs.cache

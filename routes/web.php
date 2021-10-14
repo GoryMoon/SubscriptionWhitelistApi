@@ -13,10 +13,10 @@
 |
 */
 
-$router->group(['prefix' => '{id}'], function() use ($router) {
-	$router->get('csv', 'GeneralController@csv');
-	$router->get('nl', 'GeneralController@nl');
-	$router->get('json_array', 'GeneralController@json_array');
+$router->group(['prefix' => '{id}'], function () use ($router) {
+    $router->get('csv', 'GeneralController@csv');
+    $router->get('nl', 'GeneralController@nl');
+    $router->get('json_array', 'GeneralController@json_array');
 
     $router->get('minecraft_csv', 'GeneralController@minecraft_csv');
     $router->get('minecraft_nl', 'GeneralController@minecraft_nl');
@@ -33,7 +33,7 @@ $router->group(['prefix' => '{id}'], function() use ($router) {
 
     $router->get('[{path:.*}]', function () {
         return response(['message' => 'Invalid endpoint'], 404);
-	});
+    });
 });
 
 $router->get('[{path:.*}]', function () {

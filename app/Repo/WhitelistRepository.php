@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Repo;
-
 
 use App\Models\Channel;
 use App\Models\RequestStat;
@@ -11,12 +9,13 @@ use Illuminate\Support\Collection;
 
 class WhitelistRepository
 {
-
     /**
      * @param string $id
+     *
      * @return Channel|null
      */
-    public function getChannel(string $id): ?Channel {
+    public function getChannel(string $id): ?Channel
+    {
         return Channel::whereId($id)->first();
     }
 
@@ -24,21 +23,24 @@ class WhitelistRepository
      * @param Channel $channel
      * @param string $type
      * @param string $id
+     *
      * @return mixed
      */
-    public function getWhitelist(Channel $channel, string $type, string $id) {
+    public function getWhitelist(Channel $channel, string $type, string $id)
+    {
         $key = $type . '-' . $id;
 
-        $stat = new RequestStat;
+        $stat = new RequestStat();
         $stat->channel()->associate($channel);
         $stat->save();
-        $channel->requests++;
+        ++$channel->requests;
 
         if (app('cache')->tags($id)->has($key)) {
             if ($channel->whitelist_dirty) {
                 app('cache')->tags($id)->flush();
             } else {
                 $channel->save();
+
                 return app('cache')->tags($id)->get($key);
             }
         }
@@ -49,20 +51,19 @@ class WhitelistRepository
         $list = $this->$type($whitelist);
 
         app('cache')->tags($id)->put($key, $list, 1800);
+
         return $list;
     }
 
-
-
     /**
-     *
-     * Process to filter and map values
-     *
+     * Process to filter and map values.
      */
 
     /**
-     * A general process of valid subscriptions and mapping names
+     * A general process of valid subscriptions and mapping names.
+     *
      * @param Collection $list
+     *
      * @return array
      */
     private function process(Collection $list): array
@@ -71,8 +72,10 @@ class WhitelistRepository
     }
 
     /**
-     * Base process for valid subscriptions and a valid minecraft name
+     * Base process for valid subscriptions and a valid minecraft name.
+     *
      * @param Collection $list
+     *
      * @return Collection
      */
     private function minecraftProcess(Collection $list): Collection
@@ -81,8 +84,10 @@ class WhitelistRepository
     }
 
     /**
-     * Process to filter and get all valid minecraft uuids
+     * Process to filter and get all valid minecraft uuids.
+     *
      * @param Collection $list
+     *
      * @return array
      */
     private function minecraftUuidProcess(Collection $list): array
@@ -91,8 +96,10 @@ class WhitelistRepository
     }
 
     /**
-     * Process to filter and get all valid minecraft usernames
+     * Process to filter and get all valid minecraft usernames.
+     *
      * @param Collection $list
+     *
      * @return array
      */
     private function minecraftNameProcess(Collection $list): array
@@ -101,8 +108,10 @@ class WhitelistRepository
     }
 
     /**
-     * Process to filter and get all valid minecraft:twitch usernames
+     * Process to filter and get all valid minecraft:twitch usernames.
+     *
      * @param Collection $list
+     *
      * @return array
      */
     private function minecraftTwitchNameProcess(Collection $list): array
@@ -111,8 +120,10 @@ class WhitelistRepository
     }
 
     /**
-     * Process to filter and get all valid minecraft uuids and names in the vanilla whitelist format
+     * Process to filter and get all valid minecraft uuids and names in the vanilla whitelist format.
+     *
      * @param Collection $list
+     *
      * @return array
      */
     private function minecraftWhitelistProcess(Collection $list): array
@@ -121,8 +132,10 @@ class WhitelistRepository
     }
 
     /**
-     * Process to filter valid subscriptions and connected steam accounts, then mapped all ids
+     * Process to filter valid subscriptions and connected steam accounts, then mapped all ids.
+     *
      * @param Collection $list
+     *
      * @return array
      */
     private function steamProcess(Collection $list): array
@@ -130,17 +143,15 @@ class WhitelistRepository
         return $list->filter([$this, 'filterValid'])->filter([$this, 'filterSteam'])->map([$this, 'mapSteam'])->flatten()->toArray();
     }
 
-
-
     /**
-     *
-     * Value filtering
-     *
+     * Value filtering.
      */
 
     /**
-     * Filter out only valid subscriptions
+     * Filter out only valid subscriptions.
+     *
      * @param Whitelist $value
+     *
      * @return bool
      */
     public function filterValid(Whitelist $value): bool
@@ -149,36 +160,38 @@ class WhitelistRepository
     }
 
     /**
-     * Filter out only whitelists with minecraft names
+     * Filter out only whitelists with minecraft names.
+     *
      * @param Whitelist $value
+     *
      * @return bool
      */
     public function filterMinecraft(Whitelist $value): bool
     {
-        return !is_null($value->minecraft);
+        return ! is_null($value->minecraft);
     }
 
     /**
-     * Filter out only whitelists with steam connection
+     * Filter out only whitelists with steam connection.
+     *
      * @param Whitelist $value
+     *
      * @return bool
      */
     public function filterSteam(Whitelist $value): bool
     {
-        return !is_null($value->steam);
+        return ! is_null($value->steam);
     }
 
-
-
     /**
-     *
-     * Value mapping
-     *
+     * Value mapping.
      */
 
     /**
-     * Maps a whitelist entry to the general username
+     * Maps a whitelist entry to the general username.
+     *
      * @param Whitelist $value
+     *
      * @return string
      */
     public function mapUsername(Whitelist $value): string
@@ -187,8 +200,10 @@ class WhitelistRepository
     }
 
     /**
-     * Maps a whitelist entry to the minecraft uuid
+     * Maps a whitelist entry to the minecraft uuid.
+     *
      * @param Whitelist $value
+     *
      * @return string
      */
     public function mapMinecraftUuid(Whitelist $value): string
@@ -197,8 +212,10 @@ class WhitelistRepository
     }
 
     /**
-     * Maps a whitelist entry to the minecraft username
+     * Maps a whitelist entry to the minecraft username.
+     *
      * @param Whitelist $value
+     *
      * @return string
      */
     public function mapMinecraftName(Whitelist $value): string
@@ -207,22 +224,26 @@ class WhitelistRepository
     }
 
     /**
-     * Maps a whitelist entry to the minecraft:twitch username
+     * Maps a whitelist entry to the minecraft:twitch username.
+     *
      * @param Whitelist $value
+     *
      * @return string
      */
     public function mapMinecraftTwitchName(Whitelist $value): string
-	{
-		if (is_null($value->user) || strcasecmp($value->minecraft->username, $value->user->display_name) === 0) {
-		    return $value->minecraft->username;
-		} else {
-			return $value->minecraft->username . ':' . $value->user->display_name;
-		}
+    {
+        if (is_null($value->user) || 0 === strcasecmp($value->minecraft->username, $value->user->display_name)) {
+            return $value->minecraft->username;
+        } else {
+            return $value->minecraft->username . ':' . $value->user->display_name;
+        }
     }
 
     /**
-     * Maps a whitelist entry to the minecraft whitelist format
+     * Maps a whitelist entry to the minecraft whitelist format.
+     *
      * @param Whitelist $value
+     *
      * @return array
      */
     public function mapMinecraftWhitelist(Whitelist $value): array
@@ -231,8 +252,10 @@ class WhitelistRepository
     }
 
     /**
-     * Maps a whitelist entry to the steam id
+     * Maps a whitelist entry to the steam id.
+     *
      * @param Whitelist $value
+     *
      * @return string
      */
     public function mapSteam(Whitelist $value): string
@@ -240,17 +263,15 @@ class WhitelistRepository
         return $value->steam->steam_id;
     }
 
-
-
     /**
-     *
-     * List assembly
-     *
+     * List assembly.
      */
 
     /**
-     * Formats the general usernames to a csv string
+     * Formats the general usernames to a csv string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function csv(Collection $list): string
@@ -259,8 +280,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the general usernames to a newline string
+     * Formats the general usernames to a newline string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function nl(Collection $list): string
@@ -269,8 +292,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the general usernames to a json array string
+     * Formats the general usernames to a json array string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function json_array(Collection $list): string
@@ -279,8 +304,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the minecraft uuids to a csv string
+     * Formats the minecraft uuids to a csv string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function minecraft_uuid_csv(Collection $list): string
@@ -289,8 +316,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the minecraft uuids to a newline string
+     * Formats the minecraft uuids to a newline string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function minecraft_uuid_nl(Collection $list): string
@@ -299,8 +328,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the minecraft uuids to a json array string
+     * Formats the minecraft uuids to a json array string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function minecraft_uuid_json_array(Collection $list): string
@@ -309,8 +340,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the minecraft usernames to a csv string
+     * Formats the minecraft usernames to a csv string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function minecraft_csv(Collection $list): string
@@ -319,8 +352,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the minecraft usernames to a newline string
+     * Formats the minecraft usernames to a newline string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function minecraft_nl(Collection $list): string
@@ -329,8 +364,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the minecraft:twitch usernames to a newline string
+     * Formats the minecraft:twitch usernames to a newline string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function minecraft_twitch_nl(Collection $list): string
@@ -339,8 +376,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the minecraft usernames to a json array string
+     * Formats the minecraft usernames to a json array string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function minecraft_json_array(Collection $list): string
@@ -349,8 +388,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the minecraft usernames and uuids to a json array string
+     * Formats the minecraft usernames and uuids to a json array string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function minecraft_whitelist(Collection $list): string
@@ -359,8 +400,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the steam ids to a csv string
+     * Formats the steam ids to a csv string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function steam_csv(Collection $list): string
@@ -369,8 +412,10 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the steam ids to a newline string
+     * Formats the steam ids to a newline string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function steam_nl(Collection $list): string
@@ -379,13 +424,14 @@ class WhitelistRepository
     }
 
     /**
-     * Formats the steam ids to a json array string
+     * Formats the steam ids to a json array string.
+     *
      * @param Collection $list
+     *
      * @return string
      */
     public function steam_json_array(Collection $list): string
     {
         return json_encode($this->steamProcess($list));
     }
-
 }

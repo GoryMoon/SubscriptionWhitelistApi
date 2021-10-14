@@ -16,7 +16,9 @@
         "fzaninotto/faker": "^1.9.2",
         "league/flysystem": "^1.1.5",
         "mockery/mockery": "^1.4.4",
-        "phpunit/phpunit": "^9.5.10"
+        "phpunit/phpunit": "^9.5.10",
+        "friendsofphp/php-cs-fixer": "^3.2.1",
+        "romanzipp/php-cs-fixer-config": "^3.0.1"
     },
     "autoload": {
         "psr-4": {
