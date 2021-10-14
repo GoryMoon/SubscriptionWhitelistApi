@@ -6,17 +6,17 @@
     "type": "project",
     "require": {
         "php": "^7.4|^8.0",
-        "laravel/lumen-framework": "^8.2.3",
+        "laravel/lumen-framework": "^v8.2.7",
         "vinkla/hashids": "^9.1.0",
-        "illuminate/redis": "^8.36.2",
+        "illuminate/redis": "^v8.64.0",
         "ext-json": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.10.0",
         "fzaninotto/faker": "^1.9.2",
-        "league/flysystem": "^1.1.3",
-        "mockery/mockery": "^1.4.3",
-        "phpunit/phpunit": "^9.3"
+        "league/flysystem": "^1.1.5",
+        "mockery/mockery": "^1.4.4",
+        "phpunit/phpunit": "^9.5.10"
     },
     "autoload": {
         "psr-4": {
