@@ -170,6 +170,7 @@ class PatreonAPI
 
             return true;
         }
+
         return false;
     }
 
