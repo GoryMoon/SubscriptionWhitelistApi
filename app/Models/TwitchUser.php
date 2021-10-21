@@ -4,10 +4,8 @@ namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -21,16 +19,17 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $display_name
  * @property string $broadcaster_type
- * @property string $access_token
+ * @property string|null $access_token
  * @property int|null $channel_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property string|null $refresh_token
- * @property Channel|null $channel
+ * @property \App\Models\Channel|null $channel
  * @property bool $admin
  * @property bool $broadcaster
- * @property SteamUser|null $steam
- * @property Collection|Whitelist[] $whitelist
+ * @property \App\Models\PatreonUser|null $patreon
+ * @property \App\Models\SteamUser|null $steam
+ * @property Collection|\App\Models\Whitelist[] $whitelist
  * @property int|null $whitelist_count
  *
  * @method static Builder|TwitchUser newModelQuery()
@@ -47,7 +46,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|TwitchUser whereUid($value)
  * @method static Builder|TwitchUser whereUpdatedAt($value)
  */
-class TwitchUser extends Model implements AuthenticatableContract
+class TwitchUser extends TokenModel implements AuthenticatableContract
 {
     use Authenticatable;
 
@@ -91,75 +90,13 @@ class TwitchUser extends Model implements AuthenticatableContract
     }
 
     /**
-     * Encrypts the token and sets it.
+     * Returns the connected patreon account if any.
      *
-     * @param string|null $value string
+     * @return HasOne
      */
-    public function setRefreshTokenAttribute(?string $value)
+    public function patreon(): HasOne
     {
-        if (is_null($value)) {
-            $this->attributes['refresh_token'] = null;
-        } else {
-            $this->attributes['refresh_token'] = encrypt($value);
-        }
-    }
-
-    /**
-     * Decrypts the refresh token and returns it.
-     *
-     * @param string|null $value string
-     *
-     * @return string|null
-     */
-    public function getRefreshTokenAttribute(?string $value): ?string
-    {
-        if ( ! is_null($value)) {
-            try {
-                return decrypt($value);
-            } catch (DecryptException $e) {
-                report($e);
-
-                return null;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Encrypts the token and sets it.
-     *
-     * @param string|null $value string
-     */
-    public function setAccessTokenAttribute(?string $value)
-    {
-        if (is_null($value)) {
-            $this->attributes['access_token'] = null;
-        } else {
-            $this->attributes['access_token'] = encrypt($value);
-        }
-    }
-
-    /**
-     * Decrypts the access token and returns it.
-     *
-     * @param string|null $value string
-     *
-     * @return string
-     */
-    public function getAccessTokenAttribute(?string $value): ?string
-    {
-        if ( ! is_null($value)) {
-            try {
-                return decrypt($value);
-            } catch (DecryptException $e) {
-                report($e);
-
-                return null;
-            }
-        }
-
-        return null;
+        return $this->hasOne(PatreonUser::class, 'user_id');
     }
 
     public function getAdminAttribute(): bool
@@ -170,5 +107,14 @@ class TwitchUser extends Model implements AuthenticatableContract
     public function getBroadcasterAttribute(): bool
     {
         return '' != $this->broadcaster_type || $this->admin;
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function (TwitchUser $user) {
+            $user->whitelist->each(function (Whitelist $whitelist) {
+                $whitelist->delete();
+            });
+        });
     }
 }

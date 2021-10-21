@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
  * @property string $username
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property Whitelist|null $whitelist
+ * @property \App\Models\Whitelist|null $whitelist
  *
  * @method static Builder|MinecraftUser newModelQuery()
  * @method static Builder|MinecraftUser newQuery()
@@ -28,10 +28,11 @@ use Illuminate\Support\Carbon;
  */
 class MinecraftUser extends Model
 {
+    protected $hidden = ['id', 'created_at', 'updated_at'];
     protected $fillable = ['uuid', 'username'];
 
     public function whitelist(): HasOne
     {
-        return $this->hasOne(Whitelist::class);
+        return $this->hasOne(Whitelist::class, 'minecraft_id');
     }
 }

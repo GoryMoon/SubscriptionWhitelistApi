@@ -9,20 +9,20 @@ class GeneralController extends Controller
     /**
      * @var WhitelistRepository
      */
-    private $repository;
+    private WhitelistRepository $repository;
 
     public function __construct(WhitelistRepository $repository)
     {
         $this->repository = $repository;
     }
 
-    private function handleRequest(string $id, string $type, string $content)
+    private function handleRequest(string $id, string $type, string $content, int $cache = 1800)
     {
         $ids = app('hashids')->decode($id);
         if (count($ids) > 0 && ! is_null($ids[0])) {
             $channel = $this->repository->getChannel($ids[0]);
             if ( ! is_null($channel)) {
-                $list = $this->repository->getWhitelist($channel, $type, $id);
+                $list = $this->repository->getWhitelist($channel, $type, $id, $cache);
 
                 return response($list, 200, ['Content-Type' => $content . '; charset=UTF-8']);
             }
@@ -101,5 +101,20 @@ class GeneralController extends Controller
     public function steam_json_array(string $id)
     {
         return $this->handleRequest($id, 'steam_json_array', 'application/json');
+    }
+
+    public function patreon_csv(string $id)
+    {
+        return $this->handleRequest($id, 'patreon_csv', 'text/csv', 300);
+    }
+
+    public function patreon_nl(string $id)
+    {
+        return $this->handleRequest($id, 'patreon_nl', 'text/plain', 300);
+    }
+
+    public function patreon_json_array(string $id)
+    {
+        return $this->handleRequest($id, 'patreon_json_array', 'application/json', 0);
     }
 }

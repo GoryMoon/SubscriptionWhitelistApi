@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -19,10 +21,10 @@ use Illuminate\Support\Carbon;
  * @property int $requests
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property TwitchUser|null $owner
- * @property Collection|RequestStat[] $stats
+ * @property \App\Models\TwitchUser|null $owner
+ * @property Collection|\App\Models\RequestStat[] $stats
  * @property int|null $stats_count
- * @property Collection|Whitelist[] $whitelist
+ * @property Collection|\App\Models\Whitelist[] $whitelist
  * @property int|null $whitelist_count
  *
  * @method static Builder|Channel newModelQuery()
@@ -40,18 +42,27 @@ use Illuminate\Support\Carbon;
  */
 class Channel extends Model
 {
-    public function owner()
+    public function owner(): HasOne
     {
         return $this->hasOne(TwitchUser::class);
     }
 
-    public function whitelist()
+    public function whitelist(): HasMany
     {
         return $this->hasMany(Whitelist::class);
     }
 
-    public function stats()
+    public function stats(): HasMany
     {
         return $this->hasMany(RequestStat::class);
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function (Channel $channel) {
+            $channel->whitelist->each(function (Whitelist $whitelist) {
+                $whitelist->delete();
+            });
+        });
     }
 }

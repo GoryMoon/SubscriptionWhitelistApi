@@ -5,10 +5,30 @@ namespace App\Repo;
 use App\Models\Channel;
 use App\Models\RequestStat;
 use App\Models\Whitelist;
+use App\Patreon\PatreonHelper;
 use Illuminate\Support\Collection;
 
 class WhitelistRepository
 {
+    /**
+     * Array of endpoint types to give the channel instead of the whitelists.
+     *
+     * @var string[]
+     */
+    private array $channelLists = ['patreon_csv', 'patreon_nl', 'patreon_json_array'];
+
+    /**
+     * Helper to get patreons from a channel and with the current parameters.
+     *
+     * @var PatreonHelper
+     */
+    private PatreonHelper $patreonHelper;
+
+    public function __construct(PatreonHelper $patreonHelper)
+    {
+        $this->patreonHelper = $patreonHelper;
+    }
+
     /**
      * @param string $id
      *
@@ -20,22 +40,24 @@ class WhitelistRepository
     }
 
     /**
-     * @param Channel $channel
-     * @param string $type
-     * @param string $id
+     * @param Channel $channel The channel to get the list for
+     * @param string $type The type of the of list
+     * @param string $id An id used to tag cached results
+     * @param int $cache Time in seconds to cache the list
      *
      * @return mixed
      */
-    public function getWhitelist(Channel $channel, string $type, string $id)
+    public function getWhitelist(Channel $channel, string $type, string $id, int $cache = 1800)
     {
-        $key = $type . '-' . $id;
+        $query = request()->getQueryString();
+        $key = $type . '-' . $id . (is_null($query) ? '' : '-' . $query);
 
         $stat = new RequestStat();
         $stat->channel()->associate($channel);
         $stat->save();
         ++$channel->requests;
 
-        if (app('cache')->tags($id)->has($key)) {
+        if ($cache > 0 && app('cache')->tags($id)->has($key)) {
             if ($channel->whitelist_dirty) {
                 app('cache')->tags($id)->flush();
             } else {
@@ -47,10 +69,16 @@ class WhitelistRepository
         $channel->whitelist_dirty = false;
         $channel->save();
 
-        $whitelist = $channel->whitelist()->with('minecraft')->get();
-        $list = $this->$type($whitelist);
+        if (in_array($type, $this->channelLists)) {
+            $list = $this->$type($channel);
+        } else {
+            $whitelist = $channel->whitelist()->with('minecraft')->get();
+            $list = $this->$type($whitelist);
+        }
 
-        app('cache')->tags($id)->put($key, $list, 1800);
+        if ($cache > 0) {
+            app('cache')->tags($id)->put($key, $list, $cache);
+        }
 
         return $list;
     }
@@ -433,5 +461,41 @@ class WhitelistRepository
     public function steam_json_array(Collection $list): string
     {
         return json_encode($this->steamProcess($list));
+    }
+
+    /**
+     * Formats the Patreon names to a csv string.
+     *
+     * @param Channel $channel
+     *
+     * @return string
+     */
+    public function patreon_csv(Channel $channel): string
+    {
+        return join(',', $this->patreonHelper->getPatreons($channel));
+    }
+
+    /**
+     * Formats the Patreon names to a newline string.
+     *
+     * @param Channel $channel
+     *
+     * @return string
+     */
+    public function patreon_nl(Channel $channel): string
+    {
+        return join("\n", $this->patreonHelper->getPatreons($channel));
+    }
+
+    /**
+     * Formats the Patreon names to a json array string.
+     *
+     * @param Channel $channel
+     *
+     * @return string
+     */
+    public function patreon_json_array(Channel $channel): string
+    {
+        return json_encode($this->patreonHelper->getPatreons($channel));
     }
 }

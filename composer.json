@@ -6,10 +6,12 @@
     "type": "project",
     "require": {
         "php": "^7.4|^8.0",
-        "laravel/lumen-framework": "^v8.2.7",
-        "vinkla/hashids": "^9.1.0",
-        "illuminate/redis": "^v8.64.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.4",
+        "illuminate/http": "^8.66",
+        "illuminate/redis": "^v8.66.0",
+        "laravel/lumen-framework": "^v8.3.1",
+        "vinkla/hashids": "^9.1.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.10.0",

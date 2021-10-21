@@ -15,7 +15,7 @@ use Illuminate\Support\Collection;
  * @property int $channel_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property Channel $channel
+ * @property \App\Models\Channel $channel
  *
  * @method static Builder|RequestStat newModelQuery()
  * @method static Builder|RequestStat newQuery()
@@ -56,12 +56,10 @@ class RequestStat extends Model
                 'requests' => $stat,
             ];
             $time->subHour();
-            if ($i > 24) {
-                $two_days += $stat;
-            } else {
+            if ($i <= 24) {
                 $day += $stat;
-                $two_days += $stat;
             }
+            $two_days += $stat;
         }
 
         return [$formatted, $day, $two_days];

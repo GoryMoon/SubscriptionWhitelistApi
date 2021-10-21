@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
     dirname(__DIR__)
@@ -62,6 +62,7 @@ $app->configure('app');
 $app->configure('database');
 $app->configure('cache');
 $app->configure('hashids');
+$app->configure('services');
 
 /*
 |--------------------------------------------------------------------------
@@ -93,11 +94,12 @@ $app->configure('hashids');
 |
 */
 
-if ($app->environment() == "local") {
+if ('local' == $app->environment()) {
     $app->register(Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class);
 }
 $app->register(\Vinkla\Hashids\HashidsServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
+$app->register(App\Providers\HttpServiceProvider::class);
 
 // $app->register(App\Providers\AppServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
@@ -117,7 +119,7 @@ $app->register(Illuminate\Redis\RedisServiceProvider::class);
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
-    require __DIR__.'/../routes/web.php';
+    require __DIR__ . '/../routes/web.php';
 });
 
 return $app;
