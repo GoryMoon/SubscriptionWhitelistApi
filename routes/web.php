@@ -13,10 +13,10 @@
 |
 */
 
-$router->group(['prefix' => '{id}'], function() use ($router) {
-	$router->get('csv', 'GeneralController@csv');
-	$router->get('nl', 'GeneralController@nl');
-	$router->get('json_array', 'GeneralController@json_array');
+$router->group(['prefix' => '{id}'], function () use ($router) {
+    $router->get('csv', 'GeneralController@csv');
+    $router->get('nl', 'GeneralController@nl');
+    $router->get('json_array', 'GeneralController@json_array');
 
     $router->get('minecraft_csv', 'GeneralController@minecraft_csv');
     $router->get('minecraft_nl', 'GeneralController@minecraft_nl');
@@ -31,11 +31,15 @@ $router->group(['prefix' => '{id}'], function() use ($router) {
     $router->get('steam_nl', 'GeneralController@steam_nl');
     $router->get('steam_json_array', 'GeneralController@steam_json_array');
 
+    $router->get('patreon_csv', 'GeneralController@patreon_csv');
+    $router->get('patreon_nl', 'GeneralController@patreon_nl');
+    $router->get('patreon_json_array', 'GeneralController@patreon_json_array');
+
     $router->get('[{path:.*}]', function () {
         return response(['message' => 'Invalid endpoint'], 404);
-	});
+    });
 });
 
 $router->get('[{path:.*}]', function () {
-    return response()->json(['message' => 'Not Found'], 404);
+    return response(['message' => 'Not Found'], 404);
 });

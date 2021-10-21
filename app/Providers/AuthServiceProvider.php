@@ -14,7 +14,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
     }
 
     /**
@@ -33,6 +32,7 @@ class AuthServiceProvider extends ServiceProvider
             if ($request->input('api_token')) {
                 return TwitchUser::where('api_token', $request->input('api_token'))->first();
             }
+
             return null;
         });
     }
