@@ -228,7 +228,6 @@ class PatreonAPI
      */
     private function handleResponse(Response $response)
     {
-        $this->refreshToken();
         if ($response->successful()) {
             return $response->object();
         }
