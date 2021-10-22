@@ -82,6 +82,9 @@ $app->configure('services');
 // $app->routeMiddleware([
 //     'auth' => App\Http\Middleware\Authenticate::class,
 // ]);
+$app->middleware([
+    \Bepsvpt\SecureHeaders\SecureHeadersMiddleware::class,
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -99,6 +102,7 @@ if ('local' == $app->environment()) {
 }
 $app->register(\Vinkla\Hashids\HashidsServiceProvider::class);
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
+$app->register(Bepsvpt\SecureHeaders\SecureHeadersServiceProvider::class);
 $app->register(App\Providers\HttpServiceProvider::class);
 
 // $app->register(App\Providers\AppServiceProvider::class);

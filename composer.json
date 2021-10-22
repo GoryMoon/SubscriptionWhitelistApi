@@ -7,6 +7,7 @@
     "require": {
         "php": "^7.4|^8.0",
         "ext-json": "*",
+        "bepsvpt/secure-headers": "^7.1",
         "guzzlehttp/guzzle": "^7.4",
         "illuminate/http": "^8.66",
         "illuminate/redis": "^v8.66.0",
