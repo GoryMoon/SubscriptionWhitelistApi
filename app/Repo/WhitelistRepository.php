@@ -49,10 +49,13 @@ class WhitelistRepository
      */
     public function getWhitelist(Channel $channel, string $type, string $id, int $cache = 1800)
     {
-        $query = request()->getQueryString();
+        $req = request();
+        $query = $req->getQueryString();
         $key = $type . '-' . $id . (is_null($query) ? '' : '-' . $query);
 
         $stat = new RequestStat();
+        $stat->agent = $req->header('User-Agent');
+        $stat->ip = $req->ip();
         $stat->channel()->associate($channel);
         $stat->save();
         ++$channel->requests;

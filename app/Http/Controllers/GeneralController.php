@@ -115,6 +115,6 @@ class GeneralController extends Controller
 
     public function patreon_json_array(string $id)
     {
-        return $this->handleRequest($id, 'patreon_json_array', 'application/json', 0);
+        return $this->handleRequest($id, 'patreon_json_array', 'application/json', 300);
     }
 }
