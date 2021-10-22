@@ -19,7 +19,7 @@ class PatreonHelper
     public function getPatreons(Channel $channel): array
     {
         $patreon = $channel->owner->patreon;
-        if (is_null($patreon) && is_null($patreon->campaign_id)) {
+        if (is_null($patreon) || is_null($patreon->campaign_id)) {
             return [];
         }
 
