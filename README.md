@@ -1,9 +1,8 @@
 # Subscription Whitelist API
 Repo for the subscription system api
 
-
-The base is available [here](https://github.com/GoryMoon/SubscriptionWhitelist)
-
+## Deprecated
+Archiving this repo as the functionallity of this is now merged into the main repo [here](https://github.com/GoryMoon/SubscriptionWhitelist)
 
 ## License
 MIT
